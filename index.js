@@ -29,12 +29,17 @@ app.post("/webhook", async (req, res) => {
       return res.status(400).send("bad payload");
     }
 
+    // Allow time_in_force override; default to GTC for crypto (e.g., SOLUSD) and DAY for equities
+    const inferredTif =
+      msg.tif ||
+      (symbol && symbol.toUpperCase().endsWith("USD") ? "gtc" : "day");
+
     const order = {
       symbol,
       qty,
       side,
       type: "market",
-      time_in_force: "day",
+      time_in_force: inferredTif,
     };
 
     const r = await fetch(ALPACA_URL, {
