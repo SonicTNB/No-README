@@ -21,12 +21,20 @@ app.post("/webhook", async (req, res) => {
       return res.status(401).send("bad secret");
     }
 
+    const broker = (msg.broker || "alpaca").toLowerCase();
     const side = msg.action?.toLowerCase();
     const qty = Number(msg.contracts ?? 0);
     const symbol = msg.symbol ?? "MNQ";
 
     if (!side || qty <= 0) {
       return res.status(400).send("bad payload");
+    }
+
+    if (broker !== "alpaca") {
+      // Placeholder for future routing (e.g., futures). Currently only Alpaca is wired.
+      return res
+        .status(501)
+        .json({ error: "broker not supported in this relay", broker });
     }
 
     // Allow time_in_force override; default to GTC for crypto (e.g., SOLUSD) and DAY for equities
