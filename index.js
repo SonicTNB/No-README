@@ -26,6 +26,17 @@ app.post("/webhook", async (req, res) => {
     const qty = Number(msg.contracts ?? 0);
     const symbol = msg.symbol ?? "MNQ";
 
+    // Log sanitized payload for debugging (no secrets)
+    console.log(
+      JSON.stringify({
+        broker,
+        action: side,
+        qty,
+        symbol,
+        tif: msg.tif,
+      })
+    );
+
     if (!side || qty <= 0) {
       return res.status(400).send("bad payload");
     }
