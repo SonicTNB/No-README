@@ -37,8 +37,9 @@ app.post("/webhook", async (req, res) => {
       })
     );
 
-    if (!side || qty <= 0) {
-      return res.status(400).send("bad payload");
+    // Ignore non-trade events (e.g., alert() calls with no size)
+    if (!side || qty <= 0 || (side !== "buy" && side !== "sell")) {
+      return res.json({ ok: false, ignored: true, reason: "non-trade payload" });
     }
 
     if (broker !== "alpaca") {
